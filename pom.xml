@@ -6,15 +6,22 @@
     <groupId>com.pintabar</groupId>
     <artifactId>pintabar-purchase-flow</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <modules>
+        <module>pintabar-purchase-flow-app</module>
+        <module>pintabar-purchase-flow-model</module>
+        <module>pintabar-purchase-flow-service</module>
+        <module>pintabar-purchase-flow-presentation-layer</module>
+        <module>pintabar-purchase-flow-api</module>
+    </modules>
+    <packaging>pom</packaging>
 
     <name>pintabar-purchase-flow</name>
-    <description>Demo project for Spring Boot</description>
 
     <parent>
-        <artifactId>pintabar</artifactId>
-        <groupId>com.pintabar</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.4.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <properties>
@@ -23,20 +30,25 @@
         <java.version>1.8</java.version>
         <apache.cxf.starter.version>3.1.11</apache.cxf.starter.version>
         <jackson.json.provider.version>2.8.6</jackson.json.provider.version>
+        <pintabar.shared.version>0.0.1-SNAPSHOT</pintabar.shared.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
+            <groupId>com.pintabar</groupId>
+            <artifactId>pintabar-common-errors</artifactId>
+            <version>${pintabar.shared.version}</version>
         </dependency>
-
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <groupId>com.pintabar</groupId>
+            <artifactId>pintabar-model-api</artifactId>
+            <version>${pintabar.shared.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.pintabar</groupId>
+            <artifactId>pintabar-persistence-api</artifactId>
+            <version>${pintabar.shared.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-spring-boot-starter-jaxrs</artifactId>
@@ -48,36 +60,30 @@
             <version>${jackson.json.provider.version}</version>
         </dependency>
 
-        <!-- Querydsl -->
-        <dependency>
-            <groupId>com.querydsl</groupId>
-            <artifactId>querydsl-apt</artifactId>
-        </dependency>
         <dependency>
             <groupId>com.querydsl</groupId>
             <artifactId>querydsl-jpa</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.pintabar</groupId>
-            <artifactId>pintabar-model-api</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.pintabar</groupId>
-            <artifactId>pintabar-model-api-impl</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>com.pintabar</groupId>
-            <artifactId>pintabar-persistence-api-impl</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.pintabar</groupId>
-            <artifactId>pintabar-commons</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -86,33 +92,8 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <fork>true</fork>
-                    <skip>false</skip>
+                    <skip>true</skip>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- Querydsl and Specifications -->
-            <plugin>
-                <groupId>com.mysema.maven</groupId>
-                <artifactId>apt-maven-plugin</artifactId>
-                <version>1.1.3</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>target/generated-sources/java</outputDirectory>
-                            <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

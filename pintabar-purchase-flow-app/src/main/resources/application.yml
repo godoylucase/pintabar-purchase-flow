@@ -1,0 +1,29 @@
+spring:
+    jpa:
+        database: MYSQL
+        database-platform: org.hibernate.dialect.MySQLInnoDBDialect
+        show-sql: false
+    datasource:
+        url: jdbc:mysql://localhost:3306/pintabar_purchase_flow?createDatabaseIfNotExist=true
+        username: root
+        password: password
+    aop:
+        proxy-target-class: true
+
+liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.xml
+
+cxf:
+    path: /purchaseFlow
+server:
+    port: 8080
+
+eureka:
+    client:
+        register-with-eureka: false
+        fetch-registry: false
+
+pintabar:
+  microservices:
+    userManagement:
+      host: http://localhost:8081

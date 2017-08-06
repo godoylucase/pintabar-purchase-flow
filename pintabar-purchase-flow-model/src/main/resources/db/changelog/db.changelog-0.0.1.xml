@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="1" author="lucasgodoy">
+        <preConditions onFail="MARK_RAN" onSqlOutput="TEST">
+            <not>
+                <tableExists tableName="purchase_order"/>
+            </not>
+        </preConditions>
+        <createTable tableName="purchase_order">
+            <column name="id" type="BIGINT(50)" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created_on" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_on" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="status" type="VARCHAR(255)">
+                <constraints nullable="false" unique="false"/>
+            </column>
+            <column name="parent_purchase_order_id" type="BIGINT(50)"/>
+            <column name="table_unit_uuid" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_uuid" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="parent_purchase_order_id"
+                                 baseTableName="purchase_order"
+                                 constraintName="purchase_order_parent_purchase_order_fk"
+                                 referencedColumnNames="id"
+                                 referencedTableName="purchase_order"/>
+        <createIndex tableName="purchase_order" indexName="purchase_order_parent_purchase_order_idx">
+            <column name="parent_purchase_order_id"/>
+        </createIndex>
+        <createIndex tableName="purchase_order" indexName="purchase_order_table_unit_idx">
+            <column name="table_unit_uuid"/>
+        </createIndex>
+        <createIndex tableName="purchase_order" indexName="purchase_order_user_idx">
+            <column name="user_uuid"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2" author="lucasgodoy">
+        <preConditions onFail="MARK_RAN" onSqlOutput="TEST">
+            <not>
+                <tableExists tableName="purchase_order_detail"/>
+            </not>
+        </preConditions>
+        <createTable tableName="purchase_order_detail">
+            <column name="id" type="BIGINT(50)" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created_on" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_on" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity" type="DOUBLE" defaultValueNumeric="0"/>
+            <column name="purchase_order_id" type="BIGINT(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="menu_item_instance_uuid" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="purchase_order_id"
+                                 baseTableName="purchase_order_detail"
+                                 constraintName="purchase_order_detail_purchase_order_fk"
+                                 referencedColumnNames="id"
+                                 referencedTableName="purchase_order"/>
+        <createIndex tableName="purchase_order_detail" indexName="purchase_order_detail_purchase_order_idx">
+            <column name="purchase_order_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
