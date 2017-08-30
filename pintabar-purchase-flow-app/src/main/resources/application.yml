@@ -14,7 +14,7 @@ liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.xml
 
 cxf:
-    path: /purchaseFlow
+    path: /api/purchaseFlow
 server:
     port: 8080
 
@@ -27,3 +27,8 @@ pintabar:
   microservices:
     userManagement:
       host: http://localhost:8081
+
+pintabar:
+  microservices:
+    businessManagement:
+      host: http://localhost:8083

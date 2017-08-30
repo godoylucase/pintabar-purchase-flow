@@ -21,7 +21,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @XmlRootElement
-public class OrderingWS implements BaseWS {
+public class PurchaseOrderAddItemsWS implements BaseWS {
 	private String businessUuid;
 	private String userUuid;
 	private Map<String, BigDecimal> purchaseOrderLinesMap = Maps.newHashMap();

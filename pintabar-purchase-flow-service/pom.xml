@@ -11,6 +11,7 @@
 
     <properties>
         <pintabar.user.management.api.version>0.0.1-SNAPSHOT</pintabar.user.management.api.version>
+        <pintabar.business.management.api.version>0.0.1-SNAPSHOT</pintabar.business.management.api.version>
     </properties>
 
     <artifactId>pintabar-purchase-flow-service</artifactId>
@@ -24,6 +25,11 @@
             <groupId>com.pintabar</groupId>
             <artifactId>pintabar-user-management-api</artifactId>
             <version>${pintabar.user.management.api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.pintabar</groupId>
+            <artifactId>pintabar-business-management-api</artifactId>
+            <version>${pintabar.business.management.api.version}</version>
         </dependency>
     </dependencies>
 

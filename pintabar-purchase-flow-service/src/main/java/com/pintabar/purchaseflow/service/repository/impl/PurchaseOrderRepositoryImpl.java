@@ -1,11 +1,11 @@
-package com.pintabar.purchaseflow.service.repositories.impl;
+package com.pintabar.purchaseflow.service.repository.impl;
 
 
 import com.pintabar.purchaseflow.model.entity.PurchaseOrder;
 import com.pintabar.purchaseflow.model.entity.PurchaseOrderStatus;
 import com.pintabar.purchaseflow.model.entity.QPurchaseOrder;
-import com.pintabar.purchaseflow.service.repositories.custom.CustomPurchaseOrderRepository;
-import com.pintabar.purchaseflow.service.repositories.querydsl.PurchaseOrderPredicates;
+import com.pintabar.purchaseflow.service.repository.custom.CustomPurchaseOrderRepository;
+import com.pintabar.purchaseflow.service.repository.querydsl.PurchaseOrderPredicates;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQuery;
 import org.springframework.stereotype.Component;

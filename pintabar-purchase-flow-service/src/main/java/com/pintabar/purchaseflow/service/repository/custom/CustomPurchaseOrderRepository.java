@@ -1,4 +1,4 @@
-package com.pintabar.purchaseflow.service.repositories.custom;
+package com.pintabar.purchaseflow.service.repository.custom;
 
 
 import com.pintabar.purchaseflow.model.entity.PurchaseOrder;

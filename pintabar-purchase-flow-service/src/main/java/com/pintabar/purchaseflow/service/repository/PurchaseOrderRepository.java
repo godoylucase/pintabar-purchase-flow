@@ -1,7 +1,7 @@
-package com.pintabar.purchaseflow.service.repositories;
+package com.pintabar.purchaseflow.service.repository;
 
 import com.pintabar.purchaseflow.model.entity.PurchaseOrder;
-import com.pintabar.purchaseflow.service.repositories.custom.CustomPurchaseOrderRepository;
+import com.pintabar.purchaseflow.service.repository.custom.CustomPurchaseOrderRepository;
 import com.pintabar.repositories.GenericJpaRepository;
 
 import javax.transaction.Transactional;

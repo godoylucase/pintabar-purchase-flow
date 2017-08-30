@@ -1,12 +1,12 @@
 package com.pintabar.purchaseflow.api;
 
-import com.pintabar.commons.exceptions.AppException;
 import com.pintabar.commons.exceptions.general.DataNotFoundException;
 import com.pintabar.commons.exceptions.purchaseorder.ClosedPurchaseOrderException;
 import com.pintabar.commons.exceptions.purchaseorder.InvalidPurchaseOrderException;
 import com.pintabar.commons.exceptions.user.InvalidUserException;
 import com.pintabar.commons.exceptions.user.UserWithOpenedOrderException;
-import com.pintabar.purchaseflow.presentationlayer.ws.OrderingWS;
+import com.pintabar.purchaseflow.presentationlayer.ws.PurchaseOrderAddItemsWS;
+import com.pintabar.purchaseflow.presentationlayer.ws.PurchaseOrderCreateWS;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -30,24 +30,21 @@ public interface PurchaseOrderFlowAPI {
 	@POST
 	@Path("/user/{userUuid}/tableUnit/{tableUnitUuid}/")
 	public Response createPurchaseOrder(
-			@PathParam("userUuid") String userUuid,
-			@PathParam("tableUnitUuid") String tableUnitUuid,
-			@Context UriInfo uriInfo) throws DataNotFoundException, UserWithOpenedOrderException, InvalidUserException;
+			PurchaseOrderCreateWS purchaseOrderCreateWS,
+			@Context UriInfo uriInfo)
+			throws DataNotFoundException, UserWithOpenedOrderException, InvalidUserException;
 
 	@PUT
 	@Path("/{purchaseOrderUuid}/addMenuItemInstances")
 	public Response addMenuItemInstancesToPurchaseOrder(
 			@PathParam("purchaseOrderUuid") String purchaseOrderUuid,
-			OrderingWS orderingWS) throws InvalidPurchaseOrderException, DataNotFoundException, ClosedPurchaseOrderException;
+			PurchaseOrderAddItemsWS purchaseOrderAddItemsWS)
+			throws InvalidPurchaseOrderException, DataNotFoundException, ClosedPurchaseOrderException;
 
 	@POST
 	@Path("/{purchaseOrderUuid}")
 	public Response checkoutPurchaseOrder(
-			@PathParam("purchaseOrderUuid") String purchaseOrderUuid) throws ClosedPurchaseOrderException, DataNotFoundException;
+			@PathParam("purchaseOrderUuid") String purchaseOrderUuid)
+			throws ClosedPurchaseOrderException, DataNotFoundException;
 
-//	@GET
-//	@Path("/business/{businessUuid}/menuInstance")
-//	public Response getMenuInstances(
-//			@PathParam("businessUuid") String businessUuid,
-//			@DefaultValue("false") @QueryParam("isDeleted") boolean isDeleted);
 }

@@ -3,7 +3,7 @@ package com.pintabar.purchaseflow.app.api.config;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.pintabar.commons.api.rest.mappers.AppExceptionMapper;
 import com.pintabar.commons.api.rest.mappers.GenericExceptionMapper;
-import com.pintabar.purchaseflow.app.api.impl.PurchaseOrderFlowAPIImpl;
+import com.pintabar.purchaseflow.api.PurchaseOrderFlowAPI;
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -27,7 +27,7 @@ public class CXFConfiguration {
 	private GenericExceptionMapper genericExceptionMapper;
 
 	@Autowired
-	private PurchaseOrderFlowAPIImpl orderingAPI;
+	private PurchaseOrderFlowAPI purchaseOrderFlowAPI;
 
 
 	@Bean
@@ -41,7 +41,7 @@ public class CXFConfiguration {
 	}
 
 	private void setServiceBeans(JAXRSServerFactoryBean endpoint) {
-		endpoint.setServiceBean(orderingAPI);
+		endpoint.setServiceBean(purchaseOrderFlowAPI);
 	}
 
 	private void setProviders(JAXRSServerFactoryBean endpoint) {

@@ -8,7 +8,8 @@ import com.pintabar.commons.exceptions.user.UserWithOpenedOrderException;
 import com.pintabar.purchaseflow.api.PurchaseOrderFlowAPI;
 import com.pintabar.purchaseflow.model.dto.PurchaseOrderDTO;
 import com.pintabar.purchaseflow.presentationlayer.factory.WSObjectFactory;
-import com.pintabar.purchaseflow.presentationlayer.ws.OrderingWS;
+import com.pintabar.purchaseflow.presentationlayer.ws.PurchaseOrderAddItemsWS;
+import com.pintabar.purchaseflow.presentationlayer.ws.PurchaseOrderCreateWS;
 import com.pintabar.purchaseflow.presentationlayer.ws.PurchaseOrderResumeWS;
 import com.pintabar.purchaseflow.service.PurchaseFlowService;
 import org.springframework.stereotype.Component;
@@ -30,18 +31,19 @@ public class PurchaseOrderFlowAPIImpl implements PurchaseOrderFlowAPI {
 		this.wsObjectFactory = wsObjectFactory;
 	}
 
-	public Response createPurchaseOrder(String userUuid, String tableUnitUuid, UriInfo uriInfo)
+	public Response createPurchaseOrder(PurchaseOrderCreateWS poCreate, UriInfo uriInfo)
 			throws DataNotFoundException, UserWithOpenedOrderException, InvalidUserException {
-		PurchaseOrderDTO purchaseOrder = purchaseFlowService.createPurchaseOrder(userUuid, tableUnitUuid)
-				.orElseThrow(IllegalStateException::new);
+		PurchaseOrderDTO purchaseOrder =
+				purchaseFlowService.createPurchaseOrder(poCreate.getUserUuid(), poCreate.getBusinessUuid(), poCreate.getTableUnitUuid())
+						.orElseThrow(IllegalStateException::new);
 		return Response.status(Response.Status.CREATED)
 				.entity(purchaseOrder)
 				.build();
 	}
 
-	public Response addMenuItemInstancesToPurchaseOrder(String purchaseOrderUuid, OrderingWS orderingWS)
+	public Response addMenuItemInstancesToPurchaseOrder(String purchaseOrderUuid, PurchaseOrderAddItemsWS purchaseOrderAddItemsWS)
 			throws InvalidPurchaseOrderException, DataNotFoundException, ClosedPurchaseOrderException {
-		PurchaseOrderDTO purchaseOrderDTO = purchaseFlowService.addItemsToPurchaseOrder(purchaseOrderUuid, orderingWS.getPurchaseOrderLinesMap())
+		PurchaseOrderDTO purchaseOrderDTO = purchaseFlowService.addItemsToPurchaseOrder(purchaseOrderUuid, purchaseOrderAddItemsWS.getPurchaseOrderLinesMap())
 				.orElseThrow(IllegalStateException::new);
 		return Response.status(Response.Status.OK)
 				.entity(purchaseOrderDTO)
@@ -59,7 +61,4 @@ public class PurchaseOrderFlowAPIImpl implements PurchaseOrderFlowAPI {
 				.build();
 	}
 
-//	public Response getMenuInstances(String businessUuid, boolean isDeleted) {
-//		return Response.ok(purchaseFlowService.getMenuInstances(businessUuid, isDeleted)).build();
-//	}
 }

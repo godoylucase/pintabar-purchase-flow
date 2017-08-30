@@ -1,4 +1,4 @@
-package com.pintabar.purchaseflow.service.repositories.querydsl;
+package com.pintabar.purchaseflow.service.repository.querydsl;
 
 import com.pintabar.purchaseflow.model.entity.PurchaseOrderStatus;
 import com.pintabar.purchaseflow.model.entity.QPurchaseOrder;
