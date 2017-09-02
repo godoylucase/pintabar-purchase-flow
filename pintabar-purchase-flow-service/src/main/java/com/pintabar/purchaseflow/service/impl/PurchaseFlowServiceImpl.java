@@ -1,6 +1,5 @@
 package com.pintabar.purchaseflow.service.impl;
 
-import com.pintabar.businessmanagement.api.BusinessManagementAPI;
 import com.pintabar.commons.exceptions.ErrorCode;
 import com.pintabar.commons.exceptions.general.DataNotFoundException;
 import com.pintabar.commons.exceptions.purchaseorder.ClosedPurchaseOrderException;
@@ -15,7 +14,7 @@ import com.pintabar.purchaseflow.model.entity.PurchaseOrderDetail;
 import com.pintabar.purchaseflow.model.entity.PurchaseOrderStatus;
 import com.pintabar.purchaseflow.service.PurchaseFlowService;
 import com.pintabar.purchaseflow.service.repository.PurchaseOrderRepository;
-import com.pintabar.usermanagement.api.UserManagementAPI;
+import com.pintabar.purchaseflow.service.validation.ValidationHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,22 +32,21 @@ public class PurchaseFlowServiceImpl implements PurchaseFlowService {
 
 	private final PurchaseOrderRepository purchaseOrderRepository;
 	private final PurchaseOrderDTOMapper purchaseOrderDTOMapper;
-	private final UserManagementAPI userManagementAPIProxy;
-	private final BusinessManagementAPI businessManagementAPIProxy;
+	private final ValidationHandler validationHandler;
 
-	public PurchaseFlowServiceImpl(PurchaseOrderRepository purchaseOrderRepository, PurchaseOrderDTOMapper purchaseOrderDTOMapper,
-								   UserManagementAPI userManagementAPIProxy, BusinessManagementAPI businessManagementAPIProxy) {
+	public PurchaseFlowServiceImpl(PurchaseOrderRepository purchaseOrderRepository,
+								   PurchaseOrderDTOMapper purchaseOrderDTOMapper, ValidationHandler validationHandler) {
 		this.purchaseOrderRepository = purchaseOrderRepository;
 		this.purchaseOrderDTOMapper = purchaseOrderDTOMapper;
-		this.userManagementAPIProxy = userManagementAPIProxy;
-		this.businessManagementAPIProxy = businessManagementAPIProxy;
+		this.validationHandler = validationHandler;
 	}
+
 
 	@Override
 	@Transactional
 	public Optional<PurchaseOrderDTO> createPurchaseOrder(String userUuid, String businessUuid, String tableUnitUuid)
 			throws DataNotFoundException, UserWithOpenedOrderException, InvalidUserException, InvalidTableUnitException {
-		validateBeforePurchaseOrderCreation(userUuid, businessUuid, tableUnitUuid);
+		validationHandler.validateBeforePurchaseOrderCreation(userUuid, businessUuid, tableUnitUuid);
 		PurchaseOrder purchaseOrder = createNewEmptyPurchaseOrder(userUuid, tableUnitUuid);
 		return purchaseOrderDTOMapper.mapToDTO(purchaseOrder);
 	}
@@ -59,7 +57,7 @@ public class PurchaseFlowServiceImpl implements PurchaseFlowService {
 			throws InvalidPurchaseOrderException, ClosedPurchaseOrderException, DataNotFoundException, InvalidUserException {
 		PurchaseOrder purchaseOrder = purchaseOrderRepository.findByUuid(purchaseOrderUuid)
 				.orElseThrow(() -> new DataNotFoundException(ErrorCode.PURCHASE_ORDER_NOT_FOUND));
-		validateBeforeAddingItemsToPurchaseOrder(purchaseOrder);
+		validationHandler.validateBeforeAddingItemsToPurchaseOrder(purchaseOrder);
 		// item detail rebuild from external resource and add them into purchase order
 		purchaseOrder.getDetails()
 				.addAll(processPurchaseOrderDetailsFromMap(purchaseOrderLinesMap, purchaseOrder));
@@ -71,7 +69,7 @@ public class PurchaseFlowServiceImpl implements PurchaseFlowService {
 	public Optional<PurchaseOrderDTO> checkoutPurchaseOrder(String purchaseOrderUuid) throws DataNotFoundException, ClosedPurchaseOrderException {
 		PurchaseOrder purchaseOrder = purchaseOrderRepository.findByUuid(purchaseOrderUuid)
 				.orElseThrow(() -> new DataNotFoundException(ErrorCode.PURCHASE_ORDER_NOT_FOUND));
-		validateBeforeCheckingPurchaseOrderOut(purchaseOrder);
+		validationHandler.validateBeforeCheckingPurchaseOrderOut(purchaseOrder);
 		purchaseOrder.setStatus(PurchaseOrderStatus.CLOSED_TO_BE_PAID);
 		return purchaseOrderDTOMapper.mapToDTO(purchaseOrder);
 	}
@@ -99,47 +97,5 @@ public class PurchaseFlowServiceImpl implements PurchaseFlowService {
 		Optional<PurchaseOrder> parentPurchaseOrder = purchaseOrderRepository.findParentPurchaseOrderByTableUuid(tableUnitUuid);
 		PurchaseOrder purchaseOrder = new PurchaseOrder(userUuid, tableUnitUuid, parentPurchaseOrder.orElse(null));
 		return purchaseOrderRepository.save(purchaseOrder);
-	}
-
-	private void validateBeforePurchaseOrderCreation(String userUuid, String businessUuid, String tableUnitUuid)
-			throws UserWithOpenedOrderException, DataNotFoundException, InvalidUserException, InvalidTableUnitException {
-		validateUser(userUuid);
-		validateTableUnit(businessUuid, tableUnitUuid);
-		List<PurchaseOrder> userOpenedPurchaseOrders =
-				purchaseOrderRepository.findPurchaseOrdersByUserUuidAndStatus(userUuid, PurchaseOrderStatus.OPEN_STATUSES);
-		if (!userOpenedPurchaseOrders.isEmpty()) {
-			throw new UserWithOpenedOrderException(ErrorCode.USER_ALREADY_HAS_OPENED_ORDERS);
-		}
-	}
-
-	private void validateBeforeAddingItemsToPurchaseOrder(PurchaseOrder purchaseOrder)
-			throws ClosedPurchaseOrderException, DataNotFoundException, InvalidUserException {
-		validateUser(purchaseOrder.getUserUuid());
-		// TODO: validate user is checked in to table and business uudis
-		//if (!purchaseOrder.getUuid().equals(orderingWS.getUserUuid())
-		//		|| !purchaseOrder.getTableUnit().getBusiness().getUuid().equals(orderingWS.getBusinessUuid())) {
-		//	throw new InvalidPurchaseOrderException(ErrorCode.PURCHASE_ORDER_INVALID_OWNER);
-		//} else
-		if (PurchaseOrderStatus.CLOSED_STATUSES.contains(purchaseOrder.getStatus())) {
-			throw new ClosedPurchaseOrderException(ErrorCode.PURCHASE_ORDER_ALREADY_CLOSED);
-		}
-	}
-
-	private void validateBeforeCheckingPurchaseOrderOut(PurchaseOrder purchaseOrder) throws ClosedPurchaseOrderException {
-		if (PurchaseOrderStatus.CLOSED_STATUSES.contains(purchaseOrder.getStatus())) {
-			throw new ClosedPurchaseOrderException(ErrorCode.PURCHASE_ORDER_ALREADY_CLOSED);
-		}
-	}
-
-	private void validateUser(String userUuid) throws DataNotFoundException, InvalidUserException {
-		if (!userManagementAPIProxy.validateUser(userUuid).readEntity(Boolean.class)) {
-			throw new InvalidUserException(ErrorCode.USER_INVALID);
-		}
-	}
-
-	private void validateTableUnit(String businessUuid, String tableUnitUuid) throws DataNotFoundException, InvalidTableUnitException {
-		if (!businessManagementAPIProxy.validateTableUnit(businessUuid, tableUnitUuid).readEntity(Boolean.class)) {
-			throw new InvalidTableUnitException(ErrorCode.TABLE_UNIT_INVALID);
-		}
 	}
 }
