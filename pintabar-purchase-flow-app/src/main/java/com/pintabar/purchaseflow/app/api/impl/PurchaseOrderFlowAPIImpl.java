@@ -1,9 +1,8 @@
 package com.pintabar.purchaseflow.app.api.impl;
 
 import com.pintabar.commons.exceptions.general.DataNotFoundException;
+import com.pintabar.commons.exceptions.general.InvalidEntityException;
 import com.pintabar.commons.exceptions.purchaseorder.ClosedPurchaseOrderException;
-import com.pintabar.commons.exceptions.purchaseorder.InvalidPurchaseOrderException;
-import com.pintabar.commons.exceptions.user.InvalidUserException;
 import com.pintabar.commons.exceptions.user.UserWithOpenedOrderException;
 import com.pintabar.purchaseflow.api.PurchaseOrderFlowAPI;
 import com.pintabar.purchaseflow.model.dto.PurchaseOrderDTO;
@@ -32,7 +31,7 @@ public class PurchaseOrderFlowAPIImpl implements PurchaseOrderFlowAPI {
 	}
 
 	public Response createPurchaseOrder(PurchaseOrderCreateWS poCreate, UriInfo uriInfo)
-			throws DataNotFoundException, UserWithOpenedOrderException, InvalidUserException {
+			throws DataNotFoundException, UserWithOpenedOrderException, InvalidEntityException {
 		PurchaseOrderDTO purchaseOrder =
 				purchaseFlowService.createPurchaseOrder(poCreate.getUserUuid(), poCreate.getBusinessUuid(), poCreate.getTableUnitUuid())
 						.orElseThrow(IllegalStateException::new);
@@ -42,7 +41,7 @@ public class PurchaseOrderFlowAPIImpl implements PurchaseOrderFlowAPI {
 	}
 
 	public Response addMenuItemInstancesToPurchaseOrder(String purchaseOrderUuid, PurchaseOrderAddItemsWS purchaseOrderAddItemsWS)
-			throws InvalidPurchaseOrderException, DataNotFoundException, ClosedPurchaseOrderException {
+			throws InvalidEntityException, DataNotFoundException, ClosedPurchaseOrderException {
 		PurchaseOrderDTO purchaseOrderDTO = purchaseFlowService.addItemsToPurchaseOrder(purchaseOrderUuid, purchaseOrderAddItemsWS.getPurchaseOrderLinesMap())
 				.orElseThrow(IllegalStateException::new);
 		return Response.status(Response.Status.OK)

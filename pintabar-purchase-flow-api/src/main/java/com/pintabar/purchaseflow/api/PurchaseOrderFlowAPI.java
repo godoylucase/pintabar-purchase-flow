@@ -1,9 +1,8 @@
 package com.pintabar.purchaseflow.api;
 
 import com.pintabar.commons.exceptions.general.DataNotFoundException;
+import com.pintabar.commons.exceptions.general.InvalidEntityException;
 import com.pintabar.commons.exceptions.purchaseorder.ClosedPurchaseOrderException;
-import com.pintabar.commons.exceptions.purchaseorder.InvalidPurchaseOrderException;
-import com.pintabar.commons.exceptions.user.InvalidUserException;
 import com.pintabar.commons.exceptions.user.UserWithOpenedOrderException;
 import com.pintabar.purchaseflow.presentationlayer.ws.PurchaseOrderAddItemsWS;
 import com.pintabar.purchaseflow.presentationlayer.ws.PurchaseOrderCreateWS;
@@ -32,14 +31,14 @@ public interface PurchaseOrderFlowAPI {
 	public Response createPurchaseOrder(
 			PurchaseOrderCreateWS purchaseOrderCreateWS,
 			@Context UriInfo uriInfo)
-			throws DataNotFoundException, UserWithOpenedOrderException, InvalidUserException;
+			throws DataNotFoundException, UserWithOpenedOrderException, InvalidEntityException;
 
 	@PUT
 	@Path("/{purchaseOrderUuid}/addMenuItemInstances")
 	public Response addMenuItemInstancesToPurchaseOrder(
 			@PathParam("purchaseOrderUuid") String purchaseOrderUuid,
 			PurchaseOrderAddItemsWS purchaseOrderAddItemsWS)
-			throws InvalidPurchaseOrderException, DataNotFoundException, ClosedPurchaseOrderException;
+			throws InvalidEntityException, DataNotFoundException, ClosedPurchaseOrderException;
 
 	@POST
 	@Path("/{purchaseOrderUuid}")

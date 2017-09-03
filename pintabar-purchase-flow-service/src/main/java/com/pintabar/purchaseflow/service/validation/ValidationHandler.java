@@ -3,9 +3,8 @@ package com.pintabar.purchaseflow.service.validation;
 import com.pintabar.businessmanagement.api.BusinessManagementAPI;
 import com.pintabar.commons.exceptions.ErrorCode;
 import com.pintabar.commons.exceptions.general.DataNotFoundException;
+import com.pintabar.commons.exceptions.general.InvalidEntityException;
 import com.pintabar.commons.exceptions.purchaseorder.ClosedPurchaseOrderException;
-import com.pintabar.commons.exceptions.tableunit.InvalidTableUnitException;
-import com.pintabar.commons.exceptions.user.InvalidUserException;
 import com.pintabar.commons.exceptions.user.UserWithOpenedOrderException;
 import com.pintabar.purchaseflow.model.entity.PurchaseOrder;
 import com.pintabar.purchaseflow.model.entity.PurchaseOrderStatus;
@@ -33,7 +32,7 @@ public class ValidationHandler {
 	}
 
 	public void validateBeforePurchaseOrderCreation(String userUuid, String businessUuid, String tableUnitUuid)
-			throws UserWithOpenedOrderException, DataNotFoundException, InvalidUserException, InvalidTableUnitException {
+			throws UserWithOpenedOrderException, DataNotFoundException, InvalidEntityException {
 		validateUser(userUuid);
 		validateTableUnit(businessUuid, tableUnitUuid);
 		List<PurchaseOrder> userOpenedPurchaseOrders =
@@ -44,7 +43,7 @@ public class ValidationHandler {
 	}
 
 	public void validateBeforeAddingItemsToPurchaseOrder(PurchaseOrder purchaseOrder)
-			throws ClosedPurchaseOrderException, DataNotFoundException, InvalidUserException {
+			throws ClosedPurchaseOrderException, DataNotFoundException, InvalidEntityException {
 		validateUser(purchaseOrder.getUserUuid());
 		// TODO: validate user is checked in to table and business uudis
 		//if (!purchaseOrder.getUuid().equals(orderingWS.getUserUuid())
@@ -62,15 +61,21 @@ public class ValidationHandler {
 		}
 	}
 
-	private void validateUser(String userUuid) throws DataNotFoundException, InvalidUserException {
-		if (!userManagementAPIProxy.validateUser(userUuid).readEntity(Boolean.class)) {
-			throw new InvalidUserException(ErrorCode.USER_INVALID);
+	public void validateMenuItemInstance(String businessUuid, String menuItemInstanceUuid) throws DataNotFoundException, InvalidEntityException {
+		if(!businessManagementAPIProxy.validateMenuItemInstance(businessUuid, menuItemInstanceUuid).readEntity(Boolean.class)) {
+			throw new InvalidEntityException(ErrorCode.MENU_ITEM_INSTANCE_INVALID);
 		}
 	}
 
-	private void validateTableUnit(String businessUuid, String tableUnitUuid) throws DataNotFoundException, InvalidTableUnitException {
+	private void validateUser(String userUuid) throws DataNotFoundException, InvalidEntityException {
+		if (!userManagementAPIProxy.validateUser(userUuid).readEntity(Boolean.class)) {
+			throw new InvalidEntityException(ErrorCode.USER_INVALID);
+		}
+	}
+
+	private void validateTableUnit(String businessUuid, String tableUnitUuid) throws DataNotFoundException, InvalidEntityException {
 		if (!businessManagementAPIProxy.validateTableUnit(businessUuid, tableUnitUuid).readEntity(Boolean.class)) {
-			throw new InvalidTableUnitException(ErrorCode.TABLE_UNIT_INVALID);
+			throw new InvalidEntityException(ErrorCode.TABLE_UNIT_INVALID);
 		}
 	}
 
